@@ -1,0 +1,17 @@
+[33mcommit 6eec21a0933be6b3ec7810b7dd2a1c00bb8cafbf[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: anatol <anatolminor91@inbox.ru>
+Date:   Fri Jan 14 20:07:35 2022 +0300
+
+    create model user and login, register
+
+[33mcommit 775baac10c5c5fa7d025b129ab02cc647e6a8e6e[m
+Author: anatol <anatolminor91@inbox.ru>
+Date:   Thu Jan 13 19:25:12 2022 +0300
+
+    start project
+
+[33mcommit 575961a45e28e2dc3c9c3f60f0ad48f542042f34[m
+Author: AM91-repo <97117236+AM91-repo@users.noreply.github.com>
+Date:   Tue Jan 4 20:07:08 2022 +0300
+
+    Initial commit
