@@ -1,8 +1,13 @@
+from django.contrib import auth
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 def index(request):
-    print(request.headers)
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('auth:login'))
+
     context = {
         'page_title': 'главная',
     }
