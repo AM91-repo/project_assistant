@@ -3,17 +3,25 @@
 
 {% block box %}
 
-	{% comment %} <div class="splash-screen">
+	<div class="splash-screen">
 		{% include 'mainapp/includes/main_menu.html' %}
 		<div class="text-splash-screen">
-			<h3 class="big"> лучшая экипировка</h3>
-			<p>Новый уровень комфорта. Отличные характеристики.</p>
-			<a href="{% url 'base:products' %}" 
-			class="button-order">заказать <img src="{% static '/img/arrow.png' %}" alt=""></a>
+			<h3 class="big"> пользователь: {{ user.username|default:"пользователь"|title }}</h3>
+			{% if not budget_exists %} 
+				<p>У вас пока нет созданного бюджета, хотите создать бюджет?</p> 
+				<a href="{% url 'set:budget_create' %}"
+				class="button-order">создать <img src="{% static '/img/arrow.png' %}" alt=""></a>
+			{% else %} 
+
+				<a href="{% url 'set:budget_create' %}"
+				class="button-order">создать <img src="{% static '/img/arrow.png' %}" alt=""></a>
+			
+			{% endif %}
 		</div>
 	</div>
 
-	<div class="featured">
+	{% comment %} 
+	<div class="featured">		
 		<div class="featured-menu">
 			<a class="active" href="#">Популярные</a><a href="{% url 'base:products' %}">Новинки</a>
 		</div>

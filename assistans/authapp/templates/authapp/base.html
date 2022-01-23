@@ -17,10 +17,17 @@
     {% endblock %}
 </head>
 <body>
-<div class="container">
-    <div class="login">
-        {% block container %}
-        {% endblock %}
+<div class="box">
+    <ul class="menu">
+        <li><a href="{% url 'base:description' %}" >
+            {% if request.resolver_match.url_name == 'login' %}описание{% endif %}</a>
+        </li>
+    </ul>
+    <div class="container">
+        <div class="login">
+            {% block container %}
+            {% endblock %}
+        </div>
     </div>
 </div>
 </body>

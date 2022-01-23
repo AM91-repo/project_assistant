@@ -1,0 +1,40 @@
+{% extends 'setbudgetapp/base.html' %}
+{% load static %}
+{% comment %} {% load my_tags %} {% endcomment %}
+
+{% block container %}
+    <div class="users_list">
+        <a href="{% url 'set:budget_create' %}" class="btn btn-primary new_user">
+            новый бюджет
+        </a>
+
+        {% for budget in all_budgets %}
+            <div class="product_record {% if budget.is_active %}not_active{% endif %}">
+                {% comment %} <img src="/media/{{ budget.image|default:'products_images/default.jpg' }}" alt="{{ budget.name }}"> {% endcomment %}
+                <div class="product_name">
+                    {{ budget.name|title }}
+                </div>
+                <div class="product_actions">
+                    <button>
+                        <a href={#% url 'set:source_view' pk=budget.pk %#}>подробнее</a>
+                    </button>
+                    <button>
+                        <a href={% url 'set:budget_update' pk=budget.pk %}>редактировать</a>
+                    </button>
+                    <button>
+                        <a href={% url 'set:budget_delete' pk=budget.pk %}>удалить</a>
+                    </button>
+                </div>
+                <div class="summary">
+                    <b>сумма</b>
+                    <p>{{ budget.amount }} руб</p>
+                    <b>пользователь</b>
+                    <p>{{ budget.user }}</p>
+                </div>
+                {% comment %} <div class="product_desc">
+                    {{ budget.short_desc|capfirst }}
+                </div>{% endcomment %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
