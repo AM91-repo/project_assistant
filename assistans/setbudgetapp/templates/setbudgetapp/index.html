@@ -16,7 +16,7 @@
                 </div>
                 <div class="product_actions">
                     <button>
-                        <a href={#% url 'set:source_view' pk=budget.pk %#}>подробнее</a>
+                        <a href={% url 'set:source_list' pk=budget.pk %}>подробнее</a>
                     </button>
                     <button>
                         <a href={% url 'set:budget_update' pk=budget.pk %}>редактировать</a>

@@ -10,8 +10,15 @@ urlpatterns = [
          name='budget_create'),
     path('budget/update/<int:pk>/', setbudgetapp.BudgetUpdate.as_view(),
          name='budget_update'),
-    path('category/delete/<int:pk>/', setbudgetapp.BudgetDelete.as_view(),
+    path('budget/delete/<int:pk>/', setbudgetapp.BudgetDelete.as_view(),
          name='budget_delete'),
+
+    path('budget/<int:pk>/source/', setbudgetapp.source_list,
+         name='source_list'),
+    #     path('budget/source/<int:pk>/create/', setbudgetapp.SourceCreate.as_view(),
+    #          name='source_create'),
+    path('budget/<int:budget_pk>/source/create/', setbudgetapp.source_create,
+         name='source_create'),
 
     #     path('user/update/<int:user_pk>/', setbudgetapp.ShopUserAdminUpdate.as_view(),
     #          name='user_update'),

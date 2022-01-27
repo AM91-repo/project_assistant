@@ -1,3 +1,4 @@
+from unicodedata import category
 from django.db import models
 from django.contrib.auth import get_user_model
 from authapp.models import User
@@ -17,14 +18,31 @@ class Budget(models.Model):
 
 class Source(models.Model):
     budget = models.ForeignKey(
-        Budget, on_delete=models.CASCADE, related_name='source')
+        Budget, on_delete=models.CASCADE)
     name_source = models.CharField('название', max_length=64)
     description = models.TextField('описание', blank=True)
     amount_source = models.DecimalField(
         'общая сумма', max_digits=15, decimal_places=2, default=0)
 
-    def amount_source(self):
-        pass
+    # def amount_source(self):
+    #     pass
+
+
+class Category(models.Model):
+    name = models.CharField('название', max_length=64)
+    description = models.TextField('описание', blank=True)
+
+
+class ExpenseIncome(models.Model):
+    source = models.ForeignKey(Source, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    expense = models.BooleanField(default=True)
+    description = models.TextField('описание', blank=True)
+    add_date = models.DateTimeField('время', auto_now_add=True)
+    date_event = models.DateField('время события')
+    category = models.OneToOneField(Category, on_delete=models.CASCADE)
+    amount = models.DecimalField(
+        'сумма траты', max_digits=12, decimal_places=2, default=0)
 
 
 class Spent(models.Model):

@@ -1,4 +1,4 @@
-{% extends 'adminapp/base.html' %}
+{% extends 'setbudgetapp/base.html' %}
 {% load static %}
 
 {% block menu %}
@@ -11,9 +11,9 @@
             {{ form.as_p }}
             <input class="form-control" type="submit" value="сохранить">
         </form>
-        <a href="{% url 'new_admin:category_products' object.category_id %}"
+        <a href="{% url 'set:source_list' budget.pk %}"
            class="btn btn-primary form-control last">
-            к списку продуктов
+            к списку источников
         </a>
     </div>
 {% endblock %}
