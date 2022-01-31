@@ -1,0 +1,43 @@
+{% extends 'setbudgetapp/base.html' %}
+{% load static %}
+{% comment %} {% load my_tags %} {% endcomment %}
+
+{% block container %}
+    <div class="users_list">
+        <a href="{% url 'set:expense_create' budget_pk=budget_pk %}" class="btn btn-primary new_user">
+            добавить трату
+        </a>
+        <a href="{% url 'set:income_create' budget_pk=budget_pk %}" class="btn btn-primary new_user">
+            добавить доход
+        </a>
+
+        {% for obgect in object_list %}
+            <div class="product_record">
+                {% comment %} <img src="/media/{{ obgect.image|default:'products_images/default.jpg' }}" alt="{{ obgect.name }}"> {% endcomment %}
+                <div class="product_name">
+                    {{ obgect.user.name|title }}
+                </div>
+                <div class="product_actions">
+                    <button>
+                        <a href={#% url 'set:source_list' pk=obgect.pk %#}>подробнее</a>
+                    </button>
+                    <button>
+                        <a href={#% url 'set:obgect_update' pk=obgect.pk %#}>редактировать</a>
+                    </button>
+                    <button>
+                        <a href={#% url 'set:obgect_delete' pk=obgect.pk %#}>удалить</a>
+                    </button>
+                </div>
+                <div class="summary">
+                    <b>сумма</b>
+                    <p>{{ obgect.amount }} руб</p>
+                    <b>пользователь</b>
+                    <p>{{ obgect.user }}</p>
+                </div>
+                {% comment %} <div class="product_desc">
+                    {{ obgect.short_desc|capfirst }}
+                </div>{% endcomment %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

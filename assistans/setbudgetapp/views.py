@@ -61,38 +61,49 @@ class BudgetDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
 #         return Source.objects.filter(budget=self.request.resolver_match.kwargs['pk'])
 
 
-class SourceCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
-    model = Source
-    form_class = SourceCreateForm
-    success_url = reverse_lazy('set:source_list')
-    page_title = 'управление/бюджет/источник/создание'
+# class SourceCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
+#     model = Source
+#     form_class = SourceCreateForm
+#     success_url = reverse_lazy('set:source_list')
+#     page_title = 'управление/бюджет/источник/создание'
 
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.user = self.request.user
-        return super(SourceCreate, self).form_valid(form)
+#     def form_valid(self, form):
+#         obj = form.save(commit=False)
+#         obj.user = self.request.user
+#         return super(SourceCreate, self).form_valid(form)
+
+
+class SourceDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
+    model = Source
+    # success_url = reverse_lazy('set:source_list')
+    page_title = 'управление/бюджет/источник/удаление'
+
+    def get_success_url(self):
+        return reverse('set:source_list', kwargs={'pk': self.object.budget.pk})
 
 
 class SourceUpdate(UserIsAuthMixin, PageTitleMixin, UpdateView):
     model = Source
     form_class = SourceCreateForm
-    success_url = reverse_lazy('set:source_list')
+    template_name = 'mainapp/source_form.html'
+    # success_url = reverse_lazy(self.request.META.get('HTTP_REFERER'))
     page_title = 'управление/бюджет/источник/редактирование'
 
+    def get_success_url(self):
+        return reverse('set:source_list', kwargs={'pk': self.object.budget.pk})
 
-class SourceDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
-    model = Source
-    success_url = reverse_lazy('set:source_list')
-    page_title = 'управление/бюджет/источник/удаление'
+    # def get_queryset(self):
+    #     return self.model.objects.filter(pk=self.request.resolver_match.kwargs['pk']).first()
 
 
 @login_required
 def source_list(request, pk):
-    budget = get_object_or_404(Budget, pk=pk)
+    budget_pk = pk
+    budget = get_object_or_404(Budget, pk=budget_pk)
     object_list = budget.source_set.all()
     context = {
         'page_title': 'управление/бюджет/источники',
-        'pk': pk,
+        'budget_pk': budget_pk,
         'object_list': object_list,
     }
     return render(request, 'mainapp/source_list.html', context)
@@ -121,6 +132,66 @@ def source_create(request, budget_pk):
         'budget': budget,
     }
     return render(request, 'mainapp/source_form.html', context)
+
+
+class ExpenseIncomeList(ListView):
+    model = ExpenseIncome
+    # template_name = 'xxxx_app/xxxx.html'
+    page_title = 'управление/бюджет/источник/детали'
+    # queryset = ExpenseIncome.objects.filter(source=self.object.source.pk)
+
+    def get_queryset(self):
+        return ExpenseIncome.objects.filter(source=self.request.resolver_match.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super(ExpenseIncomeList, self).get_context_data(**kwargs)
+        context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
+        print(context)
+        return context
+
+
+class IncomeCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
+    model = ExpenseIncome
+    form_class = ExpenseIncomeCreateForm
+    template_name = 'mainapp/income_form.html'
+    page_title = 'управление/бюджет/источник/детали/создание'
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user
+        obj.expense = False
+        return super(IncomeCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('set:source_details',
+                       kwargs={'pk': self.object.source.pk, 'budget_pk': self.object.source.budget.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super(IncomeCreate, self).get_context_data(**kwargs)
+        context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
+        return context
+
+
+class ExpenseCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
+    model = ExpenseIncome
+    form_class = ExpenseIncomeCreateForm
+    template_name = 'mainapp/expense_form.html'
+    page_title = 'управление/бюджет/источник/детали/создание'
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user
+        obj.expense = True
+        return super(ExpenseCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('set:source_details',
+                       kwargs={'pk': self.object.source.pk, 'budget_pk': self.object.source.budget.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super(ExpenseCreate, self).get_context_data(**kwargs)
+        context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
+        return context
 
 
 @login_required

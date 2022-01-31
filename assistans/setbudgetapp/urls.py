@@ -19,23 +19,23 @@ urlpatterns = [
     #          name='source_create'),
     path('budget/<int:budget_pk>/source/create/', setbudgetapp.source_create,
          name='source_create'),
+    #     path('budget/<int:budget_pk>/source/update/<int:pk>/', setbudgetapp.source_update,
+    #          name='source_update'),
+    path('budget/source/update/<int:pk>/', setbudgetapp.SourceUpdate.as_view(),
+         name='source_update'),
+    path('budget/source/delete/<int:pk>/', setbudgetapp.SourceDelete.as_view(),
+         name='source_delete'),
 
-    #     path('user/update/<int:user_pk>/', setbudgetapp.ShopUserAdminUpdate.as_view(),
-    #          name='user_update'),
-
-    #     path('user/delete/<int:user_pk>/', setbudgetapp.user_delete, name='user_delete'),
-
-    #     path('category/<int:pk>/products/',
-    #          setbudgetapp.category_products, name='category_products'),
-    #     path('category/<int:category_pk>/product/create/', setbudgetapp.category_product_create,
-    #          name='category_product_create'),
-
-    #     path('product/<int:pk>/', setbudgetapp.ProductDetail.as_view(), name='product_view'),
-
-    #     path('product/update/<int:pk>/', setbudgetapp.ProductUpdate.as_view(),
-    #          name='product_update'),
-    #     path('product/delete/<int:pk>/', setbudgetapp.ProductDelete.as_view(),
-    #          name='product_delete'),
+    path('budget/<int:budget_pk>/source/items/<int:pk>/',
+         setbudgetapp.ExpenseIncomeList.as_view(), name='source_details'),
+    path('budget/<int:budget_pk>/source/items/createExpense/', setbudgetapp.ExpenseCreate.as_view(),
+         name='expense_create'),
+    path('budget/<int:budget_pk>/source/items/createIncome/', setbudgetapp.IncomeCreate.as_view(),
+         name='income_create'),
+    #     path('budget/source/create/', setbudgetapp.ExpenseIncomeCreate.as_view(),
+    #          name='expense_create'),
+    #     path('budget/source/create/', setbudgetapp.ExpenseIncomeCreate.as_view(),
+    #          name='expense_create'),
 
 
 ]

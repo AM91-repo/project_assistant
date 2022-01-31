@@ -11,9 +11,9 @@
             {{ form.as_p }}
             <input class="form-control" type="submit" value="сохранить">
         </form>
-        <a href="{% url 'set:source_list' object.budget.pk %}"
+        <a href="{% url 'set:index' %}"
            class="btn btn-primary form-control last">
-            к списку источников
+            к источникам
         </a>
     </div>
 {% endblock %}

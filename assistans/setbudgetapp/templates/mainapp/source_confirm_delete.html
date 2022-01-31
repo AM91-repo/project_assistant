@@ -1,4 +1,4 @@
-{% extends 'adminapp/base.html' %}
+{% extends 'setbudgetapp/base.html' %}
 {% load static %}
 
 {% block menu %}
@@ -6,12 +6,12 @@
 
 {% block container %}
     <div class="user_delete">
-        Уверены, что хотите удалить <b>{{ object.name }}</b>?
+        Уверены, что хотите удалить <b>{{ object.name_source }}</b>?
         <form method="post">
             {% csrf_token %}
             <input class="btn btn-danger" type="submit" value="удалить">
         </form>
-        <a href="{% url 'new_admin:category_products' object.category_id %}" class="btn btn-success">
+        <a href="{% url 'set:source_list' object.budget.pk %}" class="btn btn-success">
             отмена
         </a>
     </div>

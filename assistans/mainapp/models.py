@@ -35,12 +35,14 @@ class Category(models.Model):
 
 class ExpenseIncome(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     expense = models.BooleanField(default=True)
     description = models.TextField('описание', blank=True)
     add_date = models.DateTimeField('время', auto_now_add=True)
-    date_event = models.DateField('время события')
-    category = models.OneToOneField(Category, on_delete=models.CASCADE)
+    date_event = models.DateField(
+        'время события', blank=True, null=True, default=None)
+    category = models.OneToOneField(
+        Category, on_delete=models.CASCADE, blank=True, null=True)
     amount = models.DecimalField(
         'сумма траты', max_digits=12, decimal_places=2, default=0)
 
