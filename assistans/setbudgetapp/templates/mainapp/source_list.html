@@ -18,7 +18,7 @@
                         <a href={% url 'set:source_details' pk=object.pk budget_pk=budget_pk %}>подробнее</a>
                     </button>
                     <button>
-                        <a href={% url 'set:source_update' pk=object.pk %}>редактировать</a>
+                        <a href={% url 'set:source_update' pk=object.pk budget_pk=budget_pk %}>редактировать</a>
                     </button>
                     <button>
                         <a href={% url 'set:source_delete' pk=object.pk %}>удалить</a>

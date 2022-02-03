@@ -11,7 +11,7 @@
             {% csrf_token %}
             <input class="btn btn-danger" type="submit" value="удалить">
         </form>
-        <a href="{% url 'set:index' %}" class="btn btn-success">
+        <a href="{% url 'set:source_details' pk=object.source.pk budget_pk=budget_pk %}" class="btn btn-success">
             отмена
         </a>
     </div>
