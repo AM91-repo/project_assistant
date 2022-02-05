@@ -22,7 +22,7 @@
                         <a href={#% url 'set:source_list' pk=obgect.pk %#}>подробнее</a>
                     </button> {% endcomment %}
                     <button>
-                        <a href={#% url 'set:obgect_update' pk=obgect.pk %#}>редактировать</a>
+                        <a href={% url 'set:item_update' pk=obgect.pk budget_pk=budget_pk %}>редактировать</a>
                     </button>
                     <button>
                         <a href={% url 'set:item_delete' pk=obgect.pk budget_pk=budget_pk %}>удалить</a>

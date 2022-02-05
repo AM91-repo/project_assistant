@@ -17,14 +17,17 @@ def index(request):
     # print(request.user)
     budget_exists = True
 
-    budgets = request.user.budgets.all()
-    if not budgets:
+    budget = request.user.budgets.filter(main_budget=True).first()
+    if not budget:
         budget_exists = False
+
+    total_amount = budget.get_total_amount
 
     context = {
         'budget_exists': budget_exists,
-        'budgets': budgets,
+        'budgets': budget,
         'page_title': 'главная',
+        'total_amount': total_amount,
     }
     return render(request, 'mainapp/index.html', context)
 

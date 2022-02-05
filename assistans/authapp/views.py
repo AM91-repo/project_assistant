@@ -68,7 +68,7 @@ def edit(request):
         form = UserChangeForm(
             request.POST, request.FILES, instance=request.user)
         profile_form = UserProfileChangeForm(request.POST, request.FILES,
-                                             instance=request.user.shopuserprofile)
+                                             instance=request.user.userprofile)
         if form.is_valid() and profile_form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('base:index'))

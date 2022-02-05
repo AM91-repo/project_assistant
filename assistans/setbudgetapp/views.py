@@ -52,27 +52,6 @@ class BudgetDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
     page_title = 'управление/бюджет/удаление'
 
 
-# class SourceList(ListView):
-#     model = Source
-#     # template_name = 'xxxx_app/xxxx.html'
-#     page_title = 'управление/бюджет/источник'
-
-#     def get_queryset(self):
-#         return Source.objects.filter(budget=self.request.resolver_match.kwargs['pk'])
-
-
-# class SourceCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
-#     model = Source
-#     form_class = SourceCreateForm
-#     success_url = reverse_lazy('set:source_list')
-#     page_title = 'управление/бюджет/источник/создание'
-
-#     def form_valid(self, form):
-#         obj = form.save(commit=False)
-#         obj.user = self.request.user
-#         return super(SourceCreate, self).form_valid(form)
-
-
 class SourceDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
     model = Source
     # success_url = reverse_lazy('set:source_list')
@@ -151,7 +130,7 @@ class ExpenseIncomeList(UserIsAuthMixin, PageTitleMixin, ListView):
         context = super(ExpenseIncomeList, self).get_context_data(**kwargs)
         context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
         context['source_pk'] = self.request.resolver_match.kwargs['pk']
-        print(context)
+        # print(context)
         return context
 
 
@@ -167,6 +146,7 @@ class ExpenseIncomeCreateMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
+        context['source_pk'] = self.request.resolver_match.kwargs['source_pk']
         return context
 
     def get_initial(self):
@@ -202,6 +182,25 @@ class ExpenseCreate(UserIsAuthMixin, PageTitleMixin, ExpenseIncomeCreateMixin, C
         return super(ExpenseCreate, self).form_valid(form)
 
 
+class ExpenseIncomeUpdate(UserIsAuthMixin, PageTitleMixin, UpdateView):
+    model = ExpenseIncome
+    form_class = ExpenseIncomeCreateForm
+    template_name = 'mainapp/expense_form.html'
+    # success_url = reverse_lazy(self.request.META.get('HTTP_REFERER'))
+    page_title = 'управление/бюджет/источник/редактирование'
+
+    def get_success_url(self):
+        return reverse('set:source_details',
+                       kwargs={'pk': self.object.source.pk,
+                               'budget_pk': self.object.source.budget.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super(ExpenseIncomeUpdate, self).get_context_data(**kwargs)
+        context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
+        # context['source_pk'] = self.request.resolver_match.kwargs['source_pk']
+        return context
+
+
 class ExpenseIncomeDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
     model = ExpenseIncome
     template_name = 'mainapp/expenseincome_delete.html'
@@ -213,14 +212,42 @@ class ExpenseIncomeDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
                                'budget_pk': self.request.resolver_match.kwargs['budget_pk']})
 
     def get_context_data(self, **kwargs):
-        context = super(ExpenseIncomeDelete, self).get_context_data(**kwargs)
+        context = super(ExpenseIncomeList, self).get_context_data(**kwargs)
         context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
+        context['source_pk'] = self.request.resolver_match.kwargs['pk']
         return context
+
+
+class CategoryList(UserIsAuthMixin, PageTitleMixin, ListView):
+    model = Category
+    page_title = 'управление/категории'
+
+
+class CategoryCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
+    model = Category
+    form_class = CategoryCreateForm
+    success_url = reverse_lazy('set:category')
+    page_title = 'управление/категории/создание'
+
+
+class CategoryUpdate(UserIsAuthMixin, PageTitleMixin, UpdateView):
+    model = Category
+    form_class = CategoryCreateForm
+    success_url = reverse_lazy('set:category')
+    page_title = 'управление/категории/редактирование'
+
+
+class CategoryDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
+    model = Category
+    success_url = reverse_lazy('set:category')
+    page_title = 'управление/категории/удаление'
 
 
 @login_required
 def index(request):
     all_budgets = request.user.budgets.all()
+    # for budjet in all_budgets:
+    #     budjet.calculation_total_amount()
     context = {
         'page_title': 'настройки',
         'all_budgets': all_budgets,

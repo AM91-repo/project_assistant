@@ -7,12 +7,13 @@
 		{% include 'mainapp/includes/main_menu.html' %}
 		<div class="text-splash-screen">
 			<h3 class="big"> пользователь: {{ user.username|default:"пользователь"|title }}</h3>
+			
 			{% if not budget_exists %} 
 				<p>У вас пока нет созданного бюджета, хотите создать бюджет?</p> 
 				<a href="{% url 'set:budget_create' %}"
-				class="button-order">создать <img src="{% static '/img/arrow.png' %}" alt=""></a>
+				class="button-order">создать бюджек<img src="{% static '/img/arrow.png' %}" alt=""></a>
 			{% else %} 
-
+				<h3 class="big"> Ваш основной бюджет: {{ total_amount }} руб</h3>
 				<a href="{% url 'set:budget_create' %}"
 				class="button-order">создать <img src="{% static '/img/arrow.png' %}" alt=""></a>
 			

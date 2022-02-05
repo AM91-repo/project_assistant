@@ -11,7 +11,7 @@ v{% extends 'setbudgetapp/base.html' %}
             {% csrf_token %}
             <input class="btn btn-danger" type="submit" value="удалить">
         </form>
-        <a href="{% url 'set:index' %}" class="btn btn-success">
+        <a href="{% url 'set:category' %}" class="btn btn-success">
             отмена
         </a>
     </div>
