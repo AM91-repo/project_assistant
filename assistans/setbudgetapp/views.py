@@ -246,8 +246,6 @@ class CategoryDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
 @login_required
 def index(request):
     all_budgets = request.user.budgets.all()
-    # for budjet in all_budgets:
-    #     budjet.calculation_total_amount()
     context = {
         'page_title': 'настройки',
         'all_budgets': all_budgets,

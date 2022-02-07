@@ -12,47 +12,85 @@
 				<p>У вас пока нет созданного бюджета, хотите создать бюджет?</p> 
 				<a href="{% url 'set:budget_create' %}"
 				class="button-order">создать бюджек<img src="{% static '/img/arrow.png' %}" alt=""></a>
-			{% else %} 
+			{% elif not source %} 
 				<h3 class="big"> Ваш основной бюджет: {{ total_amount }} руб</h3>
-				<a href="{% url 'set:budget_create' %}"
-				class="button-order">создать <img src="{% static '/img/arrow.png' %}" alt=""></a>
-			
+				<p>У вас пока нет созданного бюджета, хотите создать бюджет?</p>
+				<a href="{% url 'set:source_create' budget_pk=budget.pk%}"
+				class="button-order"> источник <img src="{% static '/img/arrow.png' %}" alt=""></a>
+			{% else %}
+				<h3 class="big"> Ваш основной бюджет: {{ total_amount }} руб</h3>
+				<a href="{% url 'set:income_create' budget_pk=budget.pk source_pk=source.pk %}"
+				class="button-order">доход <img src="{% static '/img/arrow.png' %}" alt=""></a>
+				<a href="{% url 'set:expense_create' budget_pk=budget.pk source_pk=source.pk %}"
+				class="button-order">расход <img src="{% static '/img/arrow.png' %}" alt=""></a>
 			{% endif %}
 		</div>
 	</div>
 
-	{% comment %} 
-	<div class="featured">		
-		<div class="featured-menu">
-			<a class="active" href="#">Популярные</a><a href="{% url 'base:products' %}">Новинки</a>
-		</div>
-		<a class="explore" href="{% url 'base:category' 0 %}">показать все <img src="{% static '/img/arrow.png' %}" alt=""></a>
-		<div class="clearfix">
-		</div>
-		<div class="tab-content">
-			<div class="block">
-				<a href="#"><img src="{% static '/img/product-1.jpg' %}" alt="">
-					<div class="text">
-						<img src="{% static '/img/icon-hover.png' %}" alt="img">
-						<h4>Отличный мяч</h4>
-						<p>высокого качества. </p>
-					</div>
+	{% if not expense_income %}
+        <div class="h2 text-center head">
+            Пока не чего нет
+        </div>
+    {% else %}
+        <div class="h2 text-center head">
+            Ваша активность {% comment %} {{ user.first_name|default:'пользователь'|title }} {% endcomment %}
+        </div>
+		<div class="paginator">
+			{% if expense_income.has_previous %}
+				<a href="{% url 'base:index' %}?page={{ expense_income.previous_page_number }}">
+					<
 				</a>
-			</div>
-			<div class="block">
-				<a href="#"><img src="{% static '/img/product-2.jpg' %}" alt="">
-					<div class="text">
-						<img src="{% static '/img/icon-hover.png' %}" alt="">
-						<h4>Баскетбольная экипировка</h4>
-						<p>для спортсменов. </p>
-					</div>
+			{% endif %}
+			<span class="current">страница {{ expense_income.number }} из {{ expense_income.paginator.num_pages }}</span>
+			{% if expense_income.has_next %}
+				<a href="{% url 'base:index' %}?page={{ expense_income.next_page_number }}">
+					>
 				</a>
-			</div>
+			{% endif %}
 		</div>
-	</div> {% endcomment %}
-
-	{% comment %} <div class="description-text">
-		<p>{{ request.headers }}</p>
-	</div> {% endcomment %}
+        <table class="table orders_list">
+            <thead>
+            <tr>
+                <th>Пользователь</th>
+                <th>Создан</th>
+                <th>Сумма</th>
+				<th>Источник</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in expense_income %}
+                <tr>
+                    <td class="td1 orders_list">{{ item.user }}</td>
+                    <td>{{ item.add_date|date:"Y-m-d H:i:s" }}</td>
+                    <td>{{ item.amount }}</td>
+                    <td>{{ item.source }}</td>
+					<td>
+						{% if item.expense %}
+							Трата
+						{% else %}
+							Доход
+						{% endif %}
+					</td>
+                    {% comment %} <td>
+                        <a href="{#% url 'set:read' pk=item.pk %#}">
+                            посмотреть
+                        </a>
+                    </td> {% endcomment %}
+                    <td>
+						<a href="{% url 'set:item_update' pk=item.pk budget_pk=budget.pk %}">
+							редактировать
+						</a>
+                    </td>
+                    {% comment %} <td>
+						<a href="{% url 'set:item_delete' pk=item.pk budget_pk=budget.pk %}">
+							удалить
+						</a>
+                    </td> {% endcomment %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 
 {% endblock  %}

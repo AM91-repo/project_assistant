@@ -1,13 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from mainapp.models import Budget
-
-
-# from django.contrib import auth
-# from django.http import HttpResponseRedirect
-# from django.urls import reverse
-# from django.contrib.auth import get_user_model
 
 
 @login_required
@@ -15,6 +10,7 @@ def index(request):
     # if not request.user.is_authenticated:
     #     return HttpResponseRedirect(reverse('auth:login'))
     # print(request.user)
+    page_num = request.GET.get('page')
     budget_exists = True
 
     budget = request.user.budgets.filter(main_budget=True).first()
@@ -23,11 +19,31 @@ def index(request):
 
     total_amount = budget.get_total_amount
 
+    source = budget.source_set.filter(budget=budget.pk).first()
+
+    source_name = list(
+        name.id for name in budget.source_set.filter(budget=budget.pk))
+    print(source_name)
+
+    expense_income = request.user.expenseincome_set.filter(
+        source__id__in=source_name)
+
+    expense_income_paginator = Paginator(expense_income, 10)
+    try:
+        expense_income = expense_income_paginator.get_page(page_num)
+    except PageNotAnInteger:
+        expense_income = expense_income_paginator.get_page(1)
+    except EmptyPage:
+        expense_income = expense_income_paginator.get_page(
+            expense_income_paginator.num_pages)
+
     context = {
         'budget_exists': budget_exists,
-        'budgets': budget,
+        'budget': budget,
         'page_title': 'главная',
         'total_amount': total_amount,
+        'source': source,
+        'expense_income': expense_income
     }
     return render(request, 'mainapp/index.html', context)
 

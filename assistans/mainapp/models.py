@@ -2,6 +2,7 @@ from unicodedata import category
 from django.db import models
 from django.contrib.auth import get_user_model
 from authapp.models import User
+from django.db import transaction
 
 
 class Budget(models.Model):
@@ -21,13 +22,19 @@ class Budget(models.Model):
     def calculation_total_amount(self):
         self._total_amount = self.amount + sum(
             map(lambda x: x.amount_source, self.source_set.all()))
-        # list_am = list(map(lambda x: x.amount_source, self.source_set.all()))
-        # print(list_am)
         self.save()
 
     @property
     def get_total_amount(self):
         return self._total_amount
+
+    def save(self, *args, **kwargs):
+        if not self.main_budget:
+            return super(Budget, self).save(*args, **kwargs)
+        with transaction.atomic():
+            Budget.objects.filter(
+                main_budget=True, user=self.user).update(main_budget=False)
+            return super(Budget, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -45,16 +52,10 @@ class Source(models.Model):
         self.amount_source = sum(
             map(lambda x: (float(x.amount) * (-1 if x.expense else 1)),
                 self.expenseincome_set.all()))
-        # list_am = list(map(lambda x: (float(x.amount) * ((-1) if x.expense else 1)),
-        #                    self.expenseincome_set.all()))
-        # print(list_am)
         self.save()
 
     def __str__(self):
         return self.name_source
-
-    # def amount_source(self):
-    #     pass
 
 
 class Category(models.Model):
@@ -79,7 +80,7 @@ class ExpenseIncome(models.Model):
         'сумма траты', max_digits=12, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        super(ExpenseIncome, self).save(*args, **kwargs)
         source = Source.objects.filter(pk=self.source.pk).first()
         budget = Budget.objects.filter(pk=source.budget.pk).first()
         source.calculation_amount()

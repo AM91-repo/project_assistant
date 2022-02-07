@@ -704,7 +704,8 @@ slider-control .block a img {
 }
 
 .splash-screen {
-	height: 870px;
+
+	height: 600px;
 	
 	/* background-image: url("/static/img/slider.jpg"); */
 	padding-left: 98px;
@@ -715,8 +716,8 @@ slider-control .block a img {
 .logo {
 	background-image: url(/static/img/logo.png);
 	margin-top: 63px;
-	width: 200px;
-	height: 200px;
+	width: 100px;
+	height: 100px;
 	float: left;
 }
 
@@ -883,7 +884,7 @@ slider-control .block a img {
 	clear: both;
 }
 .text-splash-screen {
-	margin-top: 100px;
+	margin-top: 50px;
 	position: absolute;
 }
 
