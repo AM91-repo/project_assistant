@@ -1,0 +1,18 @@
+v{% extends 'setbudgetapp/base.html' %}
+{% load static %}
+
+{% block menu %}
+{% endblock %}
+
+{% block container %}
+    <div class="user_delete">
+        Уверены, что хотите удалить запрос <b>{{ object.from_user }}</b>?
+        <form method="post">
+            {% csrf_token %}
+            <input class="btn btn-danger" type="submit" value="удалить">
+        </form>
+        <a href="{% url 'auth:request' %}" class="btn btn-success">
+            отмена
+        </a>
+    </div>
+{% endblock %}

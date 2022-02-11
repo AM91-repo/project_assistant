@@ -1,0 +1,19 @@
+<ul class="menu">
+    <li>
+        <a href="{% url 'base:index' %}">на сайт</a>
+    </li>
+    <li>
+        <a href="{% url 'auth:friends' %}">друзья</a>
+    </li>
+    <li>
+        <a href="{% url 'auth:request' %}">запросы</a>
+    </li>
+    {% comment %} <li>
+        <a href="{% url 'set:categories' %}">
+            категории
+            {% if category %}
+                : {{ category.name }}
+            {% endif %}
+        </a>
+    </li> {% endcomment %}
+</ul>

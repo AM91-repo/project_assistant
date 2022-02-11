@@ -1,14 +1,18 @@
+from multiprocessing import context
 from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, DeleteView, CreateView
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import user_passes_test
 
-from authapp.forms import UserLoginForm, UserCreationForm, UserChangeForm, UserProfileChangeForm
-from authapp.models import User, UserProfile
+from authapp.forms import UserLoginForm, UserCreationForm, UserChangeForm, UserProfileChangeForm, FriendRequestCreateForm
+from authapp.models import User, UserProfile, FriendRequest
 
 
 def login(request):
@@ -43,14 +47,15 @@ def logout(request):
 
 def register(request):
     if request.method == 'POST':
-        register_form = UserCreationForm(request.POST, request.FILES)
+        register_form = UserCreationForm(request.POST)
+        # register_form = UserCreationForm(request.POST, request.FILES)
         if register_form.is_valid():
-            user = register_form.save(commit=False)
-            user.is_active = False
-            user.set_activation_code()
-            user.save()
-            if not user.send_email_for_confirmation():
-                return HttpResponseRedirect(reverse('auth:register'))
+            # user = register_form.save(commit=False)
+            # user.is_active = False
+            # user.set_activation_code()
+            register_form.save()
+            # if not user.send_email_for_confirmation():
+            #     return HttpResponseRedirect(reverse('auth:register'))
             return HttpResponseRedirect(reverse('base:index'))
     else:
         register_form = UserCreationForm()
@@ -85,14 +90,116 @@ def edit(request):
     return render(request, 'authapp/update.html', context)
 
 
-def verify(request, email, activate_code):
-    user = get_user_model().objects.filter(email=email).first()
-    if user.activate_code == activate_code and not user.is_activation_key_expired:
-        user.is_active = True
-        user.save()
-        auth.login(request, user,
-                   backend='django.contrib.auth.backends.ModelBackend')
-    return render(request, 'authapp/verification.html')
+@login_required
+def list_friends(request):
+    user = request.user
+    # friends = FriendRequest.objects.filter(
+    #     from_user=user, to_user=user, accepte=True).all()
+    # friends_user = friends.select_related('from_user').select_related(
+    #     'to_user').exclude(from_user=user, to_user=user)
+
+    friends = FriendRequest.objects.filter(
+        from_user=user, to_user=user, accepte=True).select_related(
+        'from_user').select_related(
+        'to_user').exclude(from_user=user, to_user=user)
+
+    context = {
+        'friends': friends
+    }
+    return render(request, 'authapp/friends_list.html', context)
+
+
+@login_required
+def friend_request(request):
+    text_error = ''
+    if request.method == 'POST':
+        name_user = request.POST.get('name')
+        user = request.user
+        print(f'form: {name_user}')
+
+        friend = FriendRequest.objects.filter(
+            from_user=user, to_user=user, accepte=True).select_related(
+            'from_user').select_related(
+            'to_user').exclude(from_user=user, to_user=user)
+
+        requested_user = User.objects.filter(username=name_user).first()
+        requests_exist = FriendRequest.objects.filter(
+            from_user=user, to_user=requested_user).first()
+
+        if requested_user and not friend and not requests_exist:
+
+            friends = FriendRequest.objects.filter(
+                from_user=user, to_user=user, accepte=True).select_related(
+                'from_user').select_related(
+                'to_user').exclude(from_user=user, to_user=user)
+
+            create_request = FriendRequest()
+            create_request.from_user = user
+            create_request.to_user = requested_user
+            create_request.save()
+            return HttpResponseRedirect(reverse('authapp:friends'))
+        text_error = 'Такого пользователя нет. Попробуйте еще'
+
+    context = {
+        'page_title': 'запрос',
+        'text_error': text_error,
+    }
+    return render(request, 'authapp/friendrequest_form.html', context)
+    # return HttpResponseRedirect(reverse('authapp:friends'))
+
+
+class UserIsAuthMixin:
+    @method_decorator(user_passes_test(lambda user: user.is_authenticated))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class PageTitleMixin:
+    page_title_key = 'page_title'
+    page_title = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context[self.page_title_key] = self.page_title
+        return context
+
+
+class FriendRequestList(UserIsAuthMixin, PageTitleMixin, ListView):
+    model = FriendRequest
+    page_title = 'пользователь/запросы'
+
+
+class FriendRequestDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
+    model = FriendRequest
+    success_url = reverse_lazy('auth:request')
+    page_title = 'пользователь/запросы/удаление'
+
+
+# class FriendRequestCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
+#     model = FriendRequest
+#     form_class = FriendRequestCreateForm
+#     success_url = reverse_lazy('auth:friends')
+#     page_title = 'пользователь/запрос'
+
+#     def form_valid(self, form):
+#         obj = form.save(commit=False)
+#         obj.from_user = self.request.user
+#         return super(FriendRequest, self).form_valid(form)
+
+
+# class FriendList(UserIsAuthMixin, PageTitleMixin, ListView):
+#     model = FriendRequest
+#     page_title = 'пользователь/запрос'
+
+
+# def verify(request, email, activate_code):
+#     user = get_user_model().objects.filter(email=email).first()
+#     if user.activate_code == activate_code and not user.is_activation_key_expired:
+#         user.is_active = True
+#         user.save()
+#         auth.login(request, user,
+#                    backend='django.contrib.auth.backends.ModelBackend')
+#     return render(request, 'authapp/verification.html')
 
 
 @receiver(post_save, sender=User)

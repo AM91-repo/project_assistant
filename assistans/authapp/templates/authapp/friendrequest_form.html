@@ -1,0 +1,29 @@
+{% extends 'authapp/base.html' %}
+{% load static %}
+
+{% block menu %}
+{% endblock %}
+
+{% block container %}
+    <div class="h2 text-center head">
+        Запрос в друзья
+    </div>
+    <div class="login">
+        <form class="form-horizontal" method="post" enctype="multipart/form-data">
+            ...Наберите имя пользователя
+            {% csrf_token %}
+            <input id="POST-name" type="text" name="name">
+            {% comment %} {{ form.as_p }} {% endcomment %}
+            <p> {{text_error}} </p>
+            <input class="form-control" type="submit" value="отправить запрос">
+        </form>
+        <a href="{% url 'auth:friends' %}"
+           class="btn btn-primary form-control last">
+            к друзьям
+        </a>
+        <a href="{% url 'base:index' %}"
+           class="btn btn-primary form-control last">
+            На главную
+        </a>
+    </div>
+{% endblock %}

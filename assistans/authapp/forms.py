@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django.forms import HiddenInput, forms, ModelForm
 
-from authapp.models import UserProfile
+from authapp.models import UserProfile, FriendRequest
 
 
 class UserLoginForm(AuthenticationForm):
@@ -37,7 +37,9 @@ class UserChangeForm(AgeValidatorMixin, UserChangeForm):
     class Meta:
         model = get_user_model()
         fields = ("username", "password", "email", "first_name", "last_name",
-                  "age", "avatar")
+                  "age")
+        # fields = ("username", "password", "email", "first_name", "last_name",
+        #           "age", "avatar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,3 +63,9 @@ class UserProfileChangeForm(ModelForm):
                 field.widget = HiddenInput()
                 continue
             field.widget.attrs['class'] = f'form-control {field_name}'
+
+
+class FriendRequestCreateForm(AuthenticationForm, ModelForm):
+    class Meta:
+        model = FriendRequest
+        fields = ('to_user', 'message_request')

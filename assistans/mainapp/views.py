@@ -16,26 +16,26 @@ def index(request):
     budget = request.user.budgets.filter(main_budget=True).first()
     if not budget:
         budget_exists = False
+        source = False
+        total_amount = 0
+        expense_income = False
+    else:
+        total_amount = budget.get_total_amount
+        source = budget.source_set.filter(budget=budget.pk).first()
 
-    total_amount = budget.get_total_amount
+        source_name = list(
+            name.id for name in budget.source_set.filter(budget=budget.pk))
+        expense_income = request.user.expenseincome_set.filter(
+            source__id__in=source_name).order_by('-add_date')
 
-    source = budget.source_set.filter(budget=budget.pk).first()
-
-    source_name = list(
-        name.id for name in budget.source_set.filter(budget=budget.pk))
-    print(source_name)
-
-    expense_income = request.user.expenseincome_set.filter(
-        source__id__in=source_name)
-
-    expense_income_paginator = Paginator(expense_income, 10)
-    try:
-        expense_income = expense_income_paginator.get_page(page_num)
-    except PageNotAnInteger:
-        expense_income = expense_income_paginator.get_page(1)
-    except EmptyPage:
-        expense_income = expense_income_paginator.get_page(
-            expense_income_paginator.num_pages)
+        expense_income_paginator = Paginator(expense_income, 10)
+        try:
+            expense_income = expense_income_paginator.get_page(page_num)
+        except PageNotAnInteger:
+            expense_income = expense_income_paginator.get_page(1)
+        except EmptyPage:
+            expense_income = expense_income_paginator.get_page(
+                expense_income_paginator.num_pages)
 
     context = {
         'budget_exists': budget_exists,

@@ -11,7 +11,7 @@
 			{% if not budget_exists %} 
 				<p>У вас пока нет созданного бюджета, хотите создать бюджет?</p> 
 				<a href="{% url 'set:budget_create' %}"
-				class="button-order">создать бюджек<img src="{% static '/img/arrow.png' %}" alt=""></a>
+				class="button-order">создать<img src="{% static '/img/arrow.png' %}" alt=""></a>
 			{% elif not source %} 
 				<h3 class="big"> Ваш основной бюджет: {{ total_amount }} руб</h3>
 				<p>У вас пока нет созданного бюджета, хотите создать бюджет?</p>
