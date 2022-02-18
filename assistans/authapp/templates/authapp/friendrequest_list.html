@@ -4,23 +4,23 @@
 
 {% block container %}
     <div class="users_list">
-        {% comment %} <a href="{#% url 'set:category_create' %#}" class="btn btn-primary new_user">
-            новый категория
-        </a> {% endcomment %}
-
         {% for object in object_list %}
+            {% if object.to_user == user %} 
+                Запрос к вам в друзья
+            {% else %}
+                Ваш запрос     
+            {% endif %} 
             <div class="product_record ">
                 {% comment %} <img src="/media/{{ budget.image|default:'products_images/default.jpg' }}" alt="{{ budget.name }}"> {% endcomment %}
                 <div class="product_name">
                     {{ object.from_user|title }}
                 </div>
                 <div class="product_actions">
-                    {% comment %} <button>
-                        <a href={#% url 'set:source_list' pk=budget.pk %#}>подробнее</a>
-                    </button> {% endcomment %}
-                    <button>
-                        <a href={#% url 'set:category_update' pk=object.pk %#}>принять</a>
-                    </button>
+                    {% if object.to_user == user %} 
+                        <button>
+                            <a href={% url 'auth:request_accepte' pk=object.pk %}>принять</a>
+                        </button>
+                    {% endif %}
                     <button>
                         <a href={% url 'auth:request_delete' pk=object.pk %}>удалить</a>
                     </button>
@@ -28,13 +28,11 @@
                 <div class="summary">
                     <b>дата</b>
                     <p>{{ object.date_request }} руб</p>
-                    <b>пользователь</b>
+                    <b>пользователю</b>
                     <p>{{ object.to_user }}</p>
                 </div>
-                {% comment %} <div class="product_desc">
-                    {{ budget.short_desc|capfirst }}
-                </div>{% endcomment %}
             </div>
+               
         {% endfor %}
     </div>
 {% endblock %}

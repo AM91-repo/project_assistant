@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-from mainapp.models import Budget
+from mainapp.models import Budget, ExpenseIncome
 
 
 @login_required
@@ -13,7 +13,7 @@ def index(request):
     page_num = request.GET.get('page')
     budget_exists = True
 
-    budget = request.user.budgets.filter(main_budget=True).first()
+    budget = request.user.basic_budget
     if not budget:
         budget_exists = False
         source = False
@@ -25,7 +25,9 @@ def index(request):
 
         source_name = list(
             name.id for name in budget.source_set.filter(budget=budget.pk))
-        expense_income = request.user.expenseincome_set.filter(
+        # expense_income = request.user.expenseincome_set.filter(
+        #     source__id__in=source_name).order_by('-add_date')
+        expense_income = ExpenseIncome.objects.filter(
             source__id__in=source_name).order_by('-add_date')
 
         expense_income_paginator = Paginator(expense_income, 10)

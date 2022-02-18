@@ -1,14 +1,35 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
+from django.contrib.auth import get_user_model
 
 
 from setbudgetapp.forms import BudgetCreateForm, SourceCreateForm, ExpenseIncomeCreateForm, CategoryCreateForm
 from mainapp.models import Budget, Source, ExpenseIncome, Category
+
+
+@login_required
+def index(request):
+    all_budgets = Budget.objects.filter(
+        Q(user_created=request.user) | Q(users=request.user)).all()
+    context = {
+        'page_title': 'настройки',
+        'all_budgets': all_budgets,
+    }
+    return render(request, 'setbudgetapp/index.html', context)
+
+
+@login_required
+def set_basic_budget(request, pk):
+    user = get_user_model().objects.get(id=request.user.id)
+    user.basic_budget = Budget.objects.get(id=pk)
+    user.save()
+    return HttpResponseRedirect(reverse('set:index'))
 
 
 class UserIsAuthMixin:
@@ -35,8 +56,21 @@ class BudgetCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        obj.user = self.request.user
+        obj.user_created = self.request.user
         return super(BudgetCreate, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(BudgetCreate, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(BudgetCreate, self).get_context_data(**kwargs)
+        context['update'] = False
+        return context
 
 
 class BudgetUpdate(UserIsAuthMixin, PageTitleMixin, UpdateView):
@@ -44,6 +78,18 @@ class BudgetUpdate(UserIsAuthMixin, PageTitleMixin, UpdateView):
     form_class = BudgetCreateForm
     success_url = reverse_lazy('set:index')
     page_title = 'управление/бюджет/редактирование'
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+        kwargs = super(BudgetUpdate, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(BudgetUpdate, self).get_context_data(**kwargs)
+        context['update'] = True
+        return context
 
 
 class BudgetDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
@@ -241,13 +287,3 @@ class CategoryDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
     model = Category
     success_url = reverse_lazy('set:category')
     page_title = 'управление/категории/удаление'
-
-
-@login_required
-def index(request):
-    all_budgets = request.user.budgets.all()
-    context = {
-        'page_title': 'настройки',
-        'all_budgets': all_budgets,
-    }
-    return render(request, 'setbudgetapp/index.html', context)

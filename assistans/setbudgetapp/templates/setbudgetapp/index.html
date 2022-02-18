@@ -9,7 +9,7 @@
         </a>
 
         {% for budget in all_budgets %}
-            <div class="product_record {% if budget.is_active %}not_active{% endif %}">
+            <div class="product_record {% if not user.basic_budget.pk == budget.pk %}not_active{% endif %}">
                 {% comment %} <img src="/media/{{ budget.image|default:'products_images/default.jpg' }}" alt="{{ budget.name }}"> {% endcomment %}
                 <div class="product_name">
                     {{ budget.name|title }}
@@ -18,12 +18,18 @@
                     <button>
                         <a href={% url 'set:source_list' pk=budget.pk %}>подробнее</a>
                     </button>
-                    <button>
-                        <a href={% url 'set:budget_update' pk=budget.pk %}>редактировать</a>
-                    </button>
-                    <button>
-                        <a href={% url 'set:budget_delete' pk=budget.pk %}>удалить</a>
-                    </button>
+                    {% if budget.user_created == user %}
+                        <button>
+                            <a href={% url 'set:budget_update' pk=budget.pk %}>редактировать</a>
+                        </button>
+                        <button>
+                            <a href={% url 'set:budget_delete' pk=budget.pk %}>удалить</a>
+                        </button>
+                    {% else %}
+                        <button>
+                            <a href={% url 'set:basic_budget' pk=budget.pk %}>основной</a>
+                        </button>
+                    {% endif %}
                 </div>
                 <div class="summary">
                     <b>сумма</b>

@@ -6,17 +6,17 @@ from django.db import transaction
 
 
 class Budget(models.Model):
-    user = models.ForeignKey(get_user_model(),
-                             on_delete=models.CASCADE,
-                             related_name='budgets')
+    user_created = models.ForeignKey(get_user_model(),
+                                     on_delete=models.CASCADE,
+                                     related_name='budgets')
     name = models.CharField('название', max_length=64)
     description = models.TextField('описание', blank=True)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, blank=True)
     amount = models.DecimalField(
         'общая сумма', max_digits=15, decimal_places=2, default=0)
     _total_amount = models.DecimalField(
         'общая сумма', max_digits=15, decimal_places=2, default=0)
-    main_budget = models.BooleanField(default=False)
+    # main_budget = models.BooleanField(default=False)
     # sources_finance = models.ManyToManyField(Source)
 
     def calculation_total_amount(self):
@@ -28,13 +28,13 @@ class Budget(models.Model):
     def get_total_amount(self):
         return self._total_amount
 
-    def save(self, *args, **kwargs):
-        if not self.main_budget:
-            return super(Budget, self).save(*args, **kwargs)
-        with transaction.atomic():
-            Budget.objects.filter(
-                main_budget=True, user=self.user).update(main_budget=False)
-            return super(Budget, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.main_budget:
+    #         return super(Budget, self).save(*args, **kwargs)
+    #     with transaction.atomic():
+    #         Budget.objects.filter(
+    #             main_budget=True, user=self.user).update(main_budget=False)
+    #         return super(Budget, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name

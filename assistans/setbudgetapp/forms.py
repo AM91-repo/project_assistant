@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.forms import ModelForm, HiddenInput
+from django.forms import ModelForm, TextInput, CharField, DecimalField, BooleanField, ModelMultipleChoiceField, CheckboxSelectMultiple
 
 from mainapp.models import *
 
@@ -12,9 +12,29 @@ class FieldsWidgetMixin():
 
 
 class BudgetCreateForm(FieldsWidgetMixin, ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        """ Grants access to the request object so that only members of the current user
+        are given as options"""
+
+        self.request = kwargs.pop('request')
+        super(BudgetCreateForm, self).__init__(*args, **kwargs)
+        self.fields['users'].widget = CheckboxSelectMultiple()
+        self.fields['users'].queryset = User.objects.filter(
+            friends=self.request.user)
+
+    # name = CharField()
+    # main_budget = BooleanField()
+    # description = CharField()
+    # amount = DecimalField()
+    # users = ModelMultipleChoiceField(
+    #     queryset=None,
+    #     widget=CheckboxSelectMultiple
+    # )
+
     class Meta:
         model = Budget
-        fields = ("name", "main_budget", "description", "amount")
+        fields = ("name", "description", "amount", "users")
 
 
 class SourceCreateForm(FieldsWidgetMixin, ModelForm):

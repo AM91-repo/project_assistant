@@ -12,6 +12,8 @@ urlpatterns = [
          name='budget_update'),
     path('budget/delete/<int:pk>/', setbudgetapp.BudgetDelete.as_view(),
          name='budget_delete'),
+    path('budget/basic/<int:pk>/',
+         setbudgetapp.set_basic_budget, name='basic_budget'),
 
     path('budget/<int:pk>/source/', setbudgetapp.source_list,
          name='source_list'),

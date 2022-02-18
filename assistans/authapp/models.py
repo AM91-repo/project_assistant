@@ -1,6 +1,10 @@
 from email import message
 from django.db import models
+from django.apps import apps
 from django.contrib.auth.models import AbstractUser
+
+# from mainapp.models import Budget
+# Budget = apps.get_model('mainapp', 'Budget')
 
 
 class User(AbstractUser):
@@ -9,7 +13,9 @@ class User(AbstractUser):
     # activate_code = models.CharField(max_length=128, blank=True)
     registration_start_time = models.DateTimeField(
         auto_now_add=True, null=True)
-    # friends = models.ManyToManyField('User', blank=True)
+    friends = models.ManyToManyField('User', blank=True)
+    basic_budget = models.ForeignKey(
+        'mainapp.Budget', on_delete=models.CASCADE, blank=True, null=True)
 
 
 class UserProfile(models.Model):

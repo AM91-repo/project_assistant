@@ -11,6 +11,12 @@
             {{ form.as_p }}
             <input class="form-control" type="submit" value="сохранить">
         </form>
+        {% if update %}
+            <a href="{% url 'set:basic_budget' object.pk %}"
+                class="btn btn-primary form-control last">
+                сделать основным
+            </a>
+        {% endif%}
         <a href="{% url 'set:index' %}"
            class="btn btn-primary form-control last">
             к бюджетам

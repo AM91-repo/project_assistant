@@ -1,3 +1,5 @@
+from curses.ascii import US
+from django.db.models import Q
 from multiprocessing import context
 from django.contrib import auth
 from django.contrib.auth import get_user_model
@@ -98,10 +100,7 @@ def list_friends(request):
     # friends_user = friends.select_related('from_user').select_related(
     #     'to_user').exclude(from_user=user, to_user=user)
 
-    friends = FriendRequest.objects.filter(
-        from_user=user, to_user=user, accepte=True).select_related(
-        'from_user').select_related(
-        'to_user').exclude(from_user=user, to_user=user)
+    friends = user.friends.all()
 
     context = {
         'friends': friends
@@ -117,10 +116,7 @@ def friend_request(request):
         user = request.user
         print(f'form: {name_user}')
 
-        friend = FriendRequest.objects.filter(
-            from_user=user, to_user=user, accepte=True).select_related(
-            'from_user').select_related(
-            'to_user').exclude(from_user=user, to_user=user)
+        friend = user.friends.all()
 
         requested_user = User.objects.filter(username=name_user).first()
         requests_exist = FriendRequest.objects.filter(
@@ -148,6 +144,17 @@ def friend_request(request):
     # return HttpResponseRedirect(reverse('authapp:friends'))
 
 
+@login_required
+def accept_friend_request(request, pk):
+    friend_request = FriendRequest.objects.get(id=pk)
+    friend_request.to_user.friends.add(friend_request.from_user)
+    friend_request.from_user.friends.add(friend_request.to_user)
+    friend_request.is_active = False
+    friend_request.accepte = True
+    friend_request.save()
+    return HttpResponseRedirect(reverse('auth:request'))
+
+
 class UserIsAuthMixin:
     @method_decorator(user_passes_test(lambda user: user.is_authenticated))
     def dispatch(self, request, *args, **kwargs):
@@ -168,12 +175,20 @@ class FriendRequestList(UserIsAuthMixin, PageTitleMixin, ListView):
     model = FriendRequest
     page_title = 'пользователь/запросы'
 
+    def get_queryset(self):
+        friends = FriendRequest.objects.filter(
+            Q(from_user=self.request.user) |
+            Q(to_user=self.request.user)).filter(is_active=True).all()
+        return friends
+
 
 class FriendRequestDelete(UserIsAuthMixin, PageTitleMixin, DeleteView):
     model = FriendRequest
     success_url = reverse_lazy('auth:request')
     page_title = 'пользователь/запросы/удаление'
 
+
+# def friend_budget
 
 # class FriendRequestCreate(UserIsAuthMixin, PageTitleMixin, CreateView):
 #     model = FriendRequest
