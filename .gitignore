@@ -1,1 +1,4 @@
 *.sqlite3
+env/
+.env.prod
+.env.prod.db
