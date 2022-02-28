@@ -3,12 +3,12 @@ version: '3.7'
 services:
   web:
     build:
-      context: ./app
+      context: ./assistans
       dockerfile: Dockerfile.prod
-    command: gunicorn web_django.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn assistans.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - static_volume:/home/app/web/static
-      - media_volume:/home/app/web/media
+      - static_volume:/home/assistans/web/static
+      - media_volume:/home/assistans/web/media
     expose:
       - 8000
     env_file:
@@ -26,8 +26,8 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - static_volume:/home/app/web/static
-      - media_volume:/home/app/web/media
+      - static_volume:/home/assistans/web/static
+      - media_volume:/home/assistans/web/media
     ports:
       - 1337:80
     depends_on:
