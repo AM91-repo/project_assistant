@@ -183,19 +183,28 @@ class ExpenseIncomeList(UserIsAuthMixin, PageTitleMixin, ListView):
 class ExpenseIncomeCreateMixin:
     model = ExpenseIncome
     form_class = ExpenseIncomeCreateForm
+    http_referer = ''
 
     def get_success_url(self):
-        return reverse('set:source_details',
-                       kwargs={'pk': self.object.source.pk,
-                               'budget_pk': self.object.source.budget.pk})
+        # print(self.request.META.get('HTTP_REFERER'))
+        print(self.request.POST.get('next'))
+
+        if '/set' in self.request.POST.get('next'):
+            return reverse('set:source_details',
+                           kwargs={'pk': self.object.source.pk,
+                                   'budget_pk': self.object.source.budget.pk})
+        else:
+            return reverse('base:index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['budget_pk'] = self.request.resolver_match.kwargs['budget_pk']
         context['source_pk'] = self.request.resolver_match.kwargs['source_pk']
+        context['url'] = self.request.META.get('HTTP_REFERER')
         return context
 
     def get_initial(self):
+        # self.http_referer = self.request.POST.get('next')
         initial = super().get_initial()
         initial = initial.copy()
         initial['source'] = self.request.resolver_match.kwargs['source_pk']
@@ -209,6 +218,7 @@ class IncomeCreate(UserIsAuthMixin, PageTitleMixin, ExpenseIncomeCreateMixin, Cr
     page_title = 'управление/бюджет/источник/детали/создание'
 
     def form_valid(self, form):
+        self.http_referer = self.request.POST.get('next')
         obj = form.save(commit=False)
         obj.user = self.request.user
         obj.expense = False

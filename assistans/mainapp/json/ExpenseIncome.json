@@ -1,0 +1,1 @@
+[{"id": 1, "source_id": 1, "user_id": 1, "expense": False, "description": "", "add_date": datetime.datetime(2022, 3, 7, 6, 18, 32, 651521, tzinfo=<UTC>), "date_event": None, "category_id": None, "amount": 500.0}]
