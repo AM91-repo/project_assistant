@@ -1,12 +1,19 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
 
 from mainapp.models import Budget, ExpenseIncome
 
 
 @login_required
 def index(request):
+    '''
+    The user's home page for displaying basic information
+    '''
+
     # if not request.user.is_authenticated:
     #     return HttpResponseRedirect(reverse('auth:login'))
     # print(request.user)
@@ -51,6 +58,12 @@ def index(request):
 
 
 def description(request):
+    root_project = settings.SITE_ROOT[:-10]
+
+    file = f'{root_project}/configs/description.txt'
+    with open(file, 'r') as f:
+        description = f.read()
+
     contacts = [
         {'city': 'Санкт-петербург',
          'phone': '+7-123-456-7890',
@@ -60,5 +73,6 @@ def description(request):
     context = {
         'page_title': 'контакты',
         'contacts': contacts,
+        'description': description,
     }
     return render(request, 'mainapp/contact.html', context)
